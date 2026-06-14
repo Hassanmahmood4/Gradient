@@ -1,26 +1,133 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ----------------------------------------------------------------------------
+   Gradient — warm dark + duotone design tokens
+   Neutrals tinted toward warm hue 60. Duotone accents: coral (35) x violet (288)
+---------------------------------------------------------------------------- */
+
+@theme {
+  /* neutrals */
+  --color-bg: oklch(0.17 0.012 60);
+  --color-surface: oklch(0.21 0.014 60);
+  --color-surface-2: oklch(0.25 0.016 60);
+  --color-border: oklch(0.32 0.014 60);
+  --color-border-soft: oklch(0.27 0.014 60);
+  --color-text: oklch(0.96 0.008 70);
+  --color-muted: oklch(0.74 0.012 70);
+  --color-faint: oklch(0.55 0.012 70);
+
+  /* duotone accents */
+  --color-coral: oklch(0.72 0.17 35);
+  --color-coral-strong: oklch(0.66 0.19 32);
+  --color-violet: oklch(0.64 0.19 288);
+  --color-violet-strong: oklch(0.58 0.21 286);
+
+  /* status */
+  --color-success: oklch(0.74 0.15 150);
+  --color-warning: oklch(0.8 0.15 75);
+  --color-danger: oklch(0.64 0.2 25);
+
+  /* fonts */
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  /* fluid type scale (perfect fourth) */
+  --text-hero: clamp(2.75rem, 7vw, 5.75rem);
+  --text-display: clamp(2rem, 4.5vw, 3.5rem);
+  --text-title: clamp(1.5rem, 2.6vw, 2.25rem);
+
+  /* easing */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ----------------------------------------------------------------------------
+   Base
+---------------------------------------------------------------------------- */
+
+* {
+  border-color: var(--color-border);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv01";
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--color-coral);
+  color: oklch(0.17 0.012 60);
+}
+
+/* Tighter, more confident display headings */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+  line-height: 0.98;
+}
+
+/* ----------------------------------------------------------------------------
+   Atmosphere utilities
+---------------------------------------------------------------------------- */
+
+/* Fine grain overlay — adds tactile texture over flat dark surfaces */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Duotone glow blob — used as background atmosphere */
+.glow-coral {
+  background: radial-gradient(closest-side, var(--color-coral), transparent);
+}
+.glow-violet {
+  background: radial-gradient(closest-side, var(--color-violet), transparent);
+}
+
+/* Hairline grid backdrop */
+.grid-lines {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--color-border) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 60%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Duotone text accent — solid violet-leaning, NOT gradient-clip (banned) */
+.text-coral { color: var(--color-coral); }
+.text-violet { color: var(--color-violet); }
+
+/* Accent-glow ring on key CTAs */
+.cta-glow {
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, white 18%, transparent) inset,
+    0 10px 30px -8px color-mix(in oklab, var(--color-coral) 70%, transparent);
+}
+
+/* ----------------------------------------------------------------------------
+   Accessibility — honor reduced motion everywhere
+---------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
