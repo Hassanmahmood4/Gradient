@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { List, X } from "@phosphor-icons/react";
+import { Show, SignInButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
@@ -56,9 +57,13 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" size="md" onClick={() => router.push("/learn")}>
-            Sign in
-          </Button>
+          <Show when="signed-out">
+            <SignInButton mode="modal" forceRedirectUrl="/learn">
+              <Button variant="ghost" size="md">
+                Sign in
+              </Button>
+            </SignInButton>
+          </Show>
           <Button size="md" onClick={() => router.push("/learn")}>
             Start learning
           </Button>
@@ -90,6 +95,17 @@ export function Navbar() {
               {l.label}
             </a>
           ))}
+          <Show when="signed-out">
+            <SignInButton mode="modal" forceRedirectUrl="/learn">
+              <Button
+                variant="ghost"
+                className="mt-1 w-full"
+                onClick={() => setOpen(false)}
+              >
+                Sign in
+              </Button>
+            </SignInButton>
+          </Show>
           <Button
             className="mt-1 w-full"
             onClick={() => {
