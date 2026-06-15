@@ -1,15 +1,17 @@
+import "server-only";
+import type { ClientQuestion, Question } from "./quiz-types";
+
 /* ----------------------------------------------------------------------------
-   Three multiple-choice questions per module. Answering all three correctly
-   auto-marks the module complete. Keyed by topic slug so the curriculum file
-   stays clean; a database can later back this exactly like the curriculum.
+   Multiple-choice questions per module (plus a 15-question final exam). Keyed
+   by topic slug. This file is `server-only`: the `answer` keys must never reach
+   the browser. The client receives sanitized `ClientQuestion`s and grading is
+   done by the `gradeQuiz` Server Action.
 ---------------------------------------------------------------------------- */
 
-export type Question = {
-  q: string;
-  code?: string; // optional snippet rendered above the options
-  options: string[];
-  answer: number; // index into options
-};
+export type { Question } from "./quiz-types";
+
+export const POINTS_PER_CORRECT = 10;
+export const FINAL_EXAM_SLUG = "final-exam";
 
 export const quizzes: Record<string, Question[]> = {
   "what-is-machine-learning": [
@@ -875,6 +877,137 @@ new = [mean(points_in(c, X, labels)) for c in range(k)]`,
   ],
 };
 
+/* ----------------------------------------------------------------------------
+   Final exam — 15 questions spanning the whole curriculum. Unlocks only after
+   every module quiz has been passed. Worth 10 points per correct answer (150).
+---------------------------------------------------------------------------- */
+
+export const finalExam: Question[] = [
+  {
+    q: "Machine learning is best described as building programs that…",
+    options: [
+      "Follow hand-written rules for every case",
+      "Learn patterns from data instead of explicit rules",
+      "Store data for fast retrieval",
+      "Render user interfaces",
+    ],
+    answer: 1,
+  },
+  {
+    q: "Clustering customers into groups with no labels is an example of…",
+    options: ["Supervised learning", "Unsupervised learning", "Reinforcement learning", "Regression"],
+    answer: 1,
+  },
+  {
+    q: "A model with high bias is most likely…",
+    options: ["Overfitting", "Underfitting", "Perfectly fit", "Memorising noise"],
+    answer: 1,
+  },
+  {
+    q: "Linear regression fits its line by minimising…",
+    options: ["Gini impurity", "Mean squared error", "Log loss", "Inertia"],
+    answer: 1,
+  },
+  {
+    q: "In gradient descent, the learning rate controls…",
+    options: [
+      "The number of features",
+      "The size of each parameter update step",
+      "The depth of the tree",
+      "The number of clusters",
+    ],
+    answer: 1,
+  },
+  {
+    q: "Logistic regression turns a linear score into a probability using the…",
+    options: ["ReLU function", "Sigmoid function", "Gini index", "Softmax over features"],
+    answer: 1,
+  },
+  {
+    q: "Before using KNN you should almost always…",
+    options: [
+      "Normalise the features to comparable scales",
+      "Remove all the labels",
+      "Increase the learning rate",
+      "Build a dendrogram",
+    ],
+    answer: 0,
+  },
+  {
+    q: "A random forest reduces variance compared with a single tree mainly by…",
+    options: [
+      "Growing one very deep tree",
+      "Averaging many decorrelated trees",
+      "Removing all randomness",
+      "Using a sigmoid output",
+    ],
+    answer: 1,
+  },
+  {
+    q: "Gradient boosting builds its trees…",
+    options: [
+      "In parallel, then averages them",
+      "Sequentially, each correcting prior errors",
+      "All from one bootstrap sample",
+      "Without using trees",
+    ],
+    answer: 1,
+  },
+  {
+    q: "K-means alternates which two steps until convergence?",
+    options: [
+      "Forward pass and backward pass",
+      "Assign points to nearest centroid, then move centroids to the mean",
+      "Split and prune",
+      "Bootstrap and vote",
+    ],
+    answer: 1,
+  },
+  {
+    q: "PCA is primarily used for…",
+    options: ["Classification", "Dimensionality reduction", "Reinforcement learning", "Labelling data"],
+    answer: 1,
+  },
+  {
+    q: "Without non-linear activations, stacking neural-network layers collapses into…",
+    options: ["A decision tree", "A single linear function", "A clustering", "A random forest"],
+    answer: 1,
+  },
+  {
+    q: "Backpropagation computes gradients using the…",
+    options: ["Chain rule, working backward", "Elbow method", "Kernel trick", "Bootstrap"],
+    answer: 0,
+  },
+  {
+    q: "On heavily imbalanced data, accuracy is misleading because…",
+    options: [
+      "It cannot be computed",
+      "Always predicting the majority class can still score high",
+      "It needs probabilities",
+      "It ignores true positives",
+    ],
+    answer: 1,
+  },
+  {
+    q: "AUC of 0.5 means the classifier is…",
+    options: ["Perfect", "No better than random", "Always overfitting", "Underfit"],
+    answer: 1,
+  },
+];
+
+// ---- server-side accessors -------------------------------------------------
+
+/** Slugs of all module quizzes (excludes the final exam). */
+export const MODULE_QUIZ_SLUGS: string[] = Object.keys(quizzes);
+
+/** Full quiz (with answers) — server use only. */
 export function getQuiz(slug: string): Question[] | undefined {
+  if (slug === FINAL_EXAM_SLUG) return finalExam;
   return quizzes[slug];
+}
+
+/** Sanitized quiz safe to send to the browser (no answer keys). */
+export function getQuizForClient(slug: string): ClientQuestion[] | undefined {
+  const quiz = getQuiz(slug);
+  return quiz?.map((q) => ({ q: q.q, code: q.code, options: q.options }));
 }
