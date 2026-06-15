@@ -72,5 +72,14 @@ export function useProgress() {
     if (!snapshot.includes(slug)) write([...snapshot, slug]);
   }, []);
 
-  return { done, isDone, toggle, markComplete, loaded: hydrated };
+  // Union in slugs known-complete from the server (the DB is the source of
+  // truth for passed quizzes; this keeps the sidebar ticks in sync on load).
+  const mergeComplete = useCallback((slugs: string[]) => {
+    const next = new Set(snapshot);
+    const before = next.size;
+    for (const s of slugs) next.add(s);
+    if (next.size !== before) write([...next]);
+  }, []);
+
+  return { done, isDone, toggle, markComplete, mergeComplete, loaded: hydrated };
 }

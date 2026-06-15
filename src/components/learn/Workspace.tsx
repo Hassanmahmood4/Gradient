@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { List, X, ArrowLeft } from "@phosphor-icons/react";
+import { List, X } from "@phosphor-icons/react";
 import { Logo } from "@/components/ui/Logo";
 import { Sidebar } from "@/components/learn/Sidebar";
+import { AuthControls } from "@/components/learn/AuthControls";
+import { PointsBadge } from "@/components/learn/PointsBadge";
+import { ProgressSync } from "@/components/learn/ProgressSync";
 import { cn } from "@/lib/utils";
 
 export function Workspace({ children }: { children: React.ReactNode }) {
@@ -12,6 +15,7 @@ export function Workspace({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen">
+      <ProgressSync />
         {/* top bar */}
         <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-border-soft bg-bg/80 px-4 backdrop-blur">
           <button
@@ -28,12 +32,10 @@ export function Workspace({ children }: { children: React.ReactNode }) {
           <span className="hidden font-mono text-xs text-faint sm:inline">
             / learn
           </span>
-          <Link
-            href="/"
-            className="ml-auto flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-text"
-          >
-            <ArrowLeft size={14} /> Back to site
-          </Link>
+          <div className="ml-auto flex items-center gap-3">
+            <PointsBadge />
+            <AuthControls />
+          </div>
         </header>
 
         <div className="mx-auto flex max-w-7xl">

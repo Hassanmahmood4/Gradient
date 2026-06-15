@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MagnifyingGlass, Check, Flask } from "@phosphor-icons/react";
+import { MagnifyingGlass, Check, Flask, Trophy } from "@phosphor-icons/react";
 import { curriculum, allTopics } from "@/lib/curriculum";
 import { useProgress } from "@/components/learn/progress";
 import { cn } from "@/lib/utils";
@@ -114,6 +114,36 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         ))}
         {filtered.length === 0 ? (
           <p className="px-3 py-6 text-sm text-faint">No topics match “{query}”.</p>
+        ) : null}
+
+        {!q ? (
+          <div className="mt-4 border-t border-border-soft pt-3">
+            <Link
+              href="/learn/final-exam"
+              onClick={onNavigate}
+              className={cn(
+                "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
+                pathname === "/learn/final-exam"
+                  ? "bg-surface-2 text-text"
+                  : "text-muted hover:bg-surface-2/50 hover:text-text",
+              )}
+            >
+              <Trophy
+                size={16}
+                weight="fill"
+                className={cn(
+                  "shrink-0",
+                  pathname === "/learn/final-exam"
+                    ? "text-coral"
+                    : "text-faint group-hover:text-coral",
+                )}
+              />
+              <span className="flex-1 leading-tight font-medium">Final Exam</span>
+              <span className="font-mono text-[0.6rem] uppercase tracking-widest text-faint">
+                15 Q
+              </span>
+            </Link>
+          </div>
         ) : null}
       </nav>
     </div>
