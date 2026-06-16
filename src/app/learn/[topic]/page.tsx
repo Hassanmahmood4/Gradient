@@ -8,7 +8,7 @@ import {
   topicCategory,
   adjacentTopics,
 } from "@/lib/curriculum";
-import { getQuiz } from "@/lib/quizzes";
+import { getQuizForClient } from "@/lib/quizzes";
 import { LessonContent } from "@/components/learn/LessonContent";
 import { LabPanel } from "@/components/learn/LabPanel";
 import { CompleteButton } from "@/components/learn/CompleteButton";
@@ -36,7 +36,7 @@ export default async function TopicPage({
 
   const cat = topicCategory(topic);
   const { prev, next } = adjacentTopics(topic);
-  const quiz = getQuiz(topic);
+  const quiz = getQuizForClient(topic);
 
   return (
     <article className="mx-auto max-w-3xl">

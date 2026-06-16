@@ -81,6 +81,9 @@ explorer, and a classification-threshold playground.
   **[Simple Icons](https://simpleicons.org)**
 - Custom SVG visualizations and a small math helper library
   (`src/lib/ml.ts`) — no charting dependency
+- **[Clerk](https://clerk.com)** for authentication
+- **[Supabase](https://supabase.com)** (Postgres) for the points/progress store,
+  accessed server-side via Server Actions
 
 > **Note:** This project pins a specific Next.js release whose APIs and
 > conventions may differ from older versions. When working on the code, consult
@@ -176,8 +179,60 @@ is honored throughout. See [`DESIGN.md`](./DESIGN.md) and
 
 ---
 
+## Backend, accounts & points
+
+Signed-in users earn **10 points per correct quiz answer**, and a **15-question
+final exam** unlocks once every module has been passed.
+
+- **Auth:** Clerk. The root layout is wrapped in `<ClerkProvider>`, and
+  `proxy.ts` (Next.js 16's renamed Middleware) runs `clerkMiddleware()` so
+  `auth()` works in Server Actions and Components.
+- **Grading is server-authoritative.** Answer keys live in `src/lib/quizzes.ts`,
+  which is `server-only` — they never reach the browser. The client receives
+  sanitized questions and submits answers to the `gradeQuiz` Server Action
+  (`src/app/learn/actions.ts`), which recomputes the score and persists it.
+- **Scoring rule:** each quiz stores the user's *best* result, and
+  `points = SUM(best_correct) × 10`. Re-taking a quiz can only raise a score,
+  never farm points.
+- **Storage:** a single `quiz_scores` table in Supabase Postgres (see
+  `supabase/schema.sql`). Points, module completion, and final-exam unlock are
+  all derived from it.
+- **Final exam:** `/learn/final-exam` checks auth, then verifies every module
+  quiz is passed before rendering the exam; otherwise it shows a locked state
+  with a progress bar.
+
+### Backend setup
+
+1. **Clerk** — create an app at [dashboard.clerk.com](https://dashboard.clerk.com)
+   and copy the publishable and secret keys.
+2. **Supabase** — create a project at [supabase.com](https://supabase.com), then
+   run `supabase/schema.sql` in the SQL editor. Copy the project URL and the
+   **service-role** key (server-only; keep it secret).
+3. **Environment** — copy `.env.local.example` to `.env.local` and fill in:
+
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+   ```
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_…
+   CLERK_SECRET_KEY=sk_test_…
+   SUPABASE_URL=https://your-project-ref.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=…
+   ```
+
+4. `npm run dev`, sign in, and complete a quiz to start banking points.
+
+> The app builds and runs without these keys (auth and points simply stay
+> inactive), so the frontend works standalone — but accounts, points, and the
+> final exam require the setup above.
+
+---
+
 ## Roadmap
 
 - [x] Marketing landing page
 - [x] Interactive learn app with labs, quizzes, and progress tracking
-- [ ] Backend — accounts, persisted progress, and a database-backed curriculum
+- [x] Backend — Clerk auth, a Supabase-backed points system, and a gated final exam
+- [ ] Persisted lesson progress synced across devices (currently `localStorage`)
+- [ ] Leaderboard and per-category scoring
