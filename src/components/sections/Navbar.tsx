@@ -7,14 +7,8 @@ import { List, X } from "@phosphor-icons/react";
 import { Show, SignInButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
+import { navLinks as links } from "@/lib/nav";
 import { cn } from "@/lib/utils";
-
-const links = [
-  { label: "Features", href: "#features" },
-  { label: "Demo", href: "#demo" },
-  { label: "Tools", href: "#tools" },
-  { label: "Reviews", href: "#reviews" },
-];
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
