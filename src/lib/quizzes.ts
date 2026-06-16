@@ -875,6 +875,291 @@ new = [mean(points_in(c, X, labels)) for c in range(k)]`,
       answer: 1,
     },
   ],
+  numpy: [
+    {
+      q: "What is NumPy’s core data structure?",
+      options: [
+        "The DataFrame",
+        "The ndarray — a typed, n-dimensional array",
+        "A linked list",
+        "A SQL table",
+      ],
+      answer: 1,
+    },
+    {
+      q: "Why is vectorised NumPy code faster than a Python loop?",
+      options: [
+        "It uses far more memory",
+        "A single optimised C loop runs over the whole array",
+        "It skips the computation entirely",
+        "It always runs on the GPU",
+      ],
+      answer: 1,
+    },
+    {
+      q: "Broadcasting lets you…",
+      options: [
+        "Send arrays over a network",
+        "Combine arrays of different shapes without manual copying",
+        "Convert arrays into text",
+        "Sort an array in place",
+      ],
+      answer: 1,
+    },
+  ],
+  pandas: [
+    {
+      q: "A pandas DataFrame is…",
+      options: [
+        "A 1-D array",
+        "A 2-D table with labeled rows and columns",
+        "A neural network layer",
+        "A plotting library",
+      ],
+      answer: 1,
+    },
+    {
+      q: "Which selects rows by their label?",
+      options: [".iloc", ".loc", "@", "reshape"],
+      answer: 1,
+    },
+    {
+      q: "Before passing data to scikit-learn you usually…",
+      options: [
+        "Print the whole table",
+        "Convert to NumPy with to_numpy()",
+        "Delete the index",
+        "Shuffle the columns",
+      ],
+      answer: 1,
+    },
+  ],
+  "scikit-learn": [
+    {
+      q: "Which call trains a scikit-learn estimator?",
+      options: [".transform(X)", ".fit(X, y)", ".plot()", ".compile()"],
+      answer: 1,
+    },
+    {
+      q: "What does a Pipeline help prevent?",
+      options: [
+        "GPU usage",
+        "Data leakage — the same steps run on train and test",
+        "Overfitting entirely",
+        "Importing NumPy",
+      ],
+      answer: 1,
+    },
+    {
+      q: "scikit-learn is best suited to…",
+      options: [
+        "Training giant language models",
+        "Classical ML on mostly tabular data",
+        "Rendering 3-D graphics",
+        "Managing databases",
+      ],
+      answer: 1,
+    },
+  ],
+  pytorch: [
+    {
+      q: "What two superpowers does PyTorch add over NumPy?",
+      options: [
+        "Plotting and CSV loading",
+        "GPU tensors and automatic differentiation",
+        "Web serving and authentication",
+        "Spreadsheets and SQL",
+      ],
+      answer: 1,
+    },
+    {
+      q: "What does loss.backward() do?",
+      options: [
+        "Prints the loss",
+        "Computes gradients and fills .grad",
+        "Updates the weights directly",
+        "Loads the training data",
+      ],
+      answer: 1,
+    },
+    {
+      q: "Why wrap the weight update in torch.no_grad()?",
+      options: [
+        "To speed up printing",
+        "To stop autograd from tracking those operations",
+        "To enable the GPU",
+        "To shuffle the data",
+      ],
+      answer: 1,
+    },
+  ],
+  tensorflow: [
+    {
+      q: "Most people use TensorFlow through…",
+      options: ["Keras, its high-level API", "Assembly", "pandas", "the terminal only"],
+      answer: 0,
+    },
+    {
+      q: "tf.GradientTape is used to…",
+      options: [
+        "Save files to disk",
+        "Record the forward pass for custom training",
+        "Draw charts",
+        "Split the dataset",
+      ],
+      answer: 1,
+    },
+    {
+      q: "What runs a trained TensorFlow model on a phone?",
+      options: ["TF Lite", "NumPy", "Chroma", "LangChain"],
+      answer: 0,
+    },
+  ],
+  "hugging-face": [
+    {
+      q: "The main benefit of Hugging Face is…",
+      options: [
+        "Writing every model from scratch",
+        "Downloading pretrained models instead of training from zero",
+        "Faster Python loops",
+        "A new database engine",
+      ],
+      answer: 1,
+    },
+    {
+      q: "pipeline() is…",
+      options: [
+        "A plumbing tool",
+        "The quickest way to load and run a model for a task",
+        "A vector database",
+        "A loss function",
+      ],
+      answer: 1,
+    },
+    {
+      q: "Before shipping a model from the Hub you should check its…",
+      options: ["File size only", "Licence and intended use", "Number of stars", "Colour"],
+      answer: 1,
+    },
+  ],
+  embeddings: [
+    {
+      q: "An embedding turns data into…",
+      options: [
+        "A SQL row",
+        "A vector where similar items sit near each other",
+        "A compressed zip file",
+        "A single class label",
+      ],
+      answer: 1,
+    },
+    {
+      q: "Cosine similarity measures…",
+      options: [
+        "File size",
+        "The angle between two vectors",
+        "Training time",
+        "The learning rate",
+      ],
+      answer: 1,
+    },
+    {
+      q: "Embeddings power all of these EXCEPT…",
+      options: ["Semantic search", "Clustering", "RAG retrieval", "Formatting a CSV"],
+      answer: 3,
+    },
+  ],
+  "vector-databases": [
+    {
+      q: "A vector database is optimised for…",
+      options: [
+        "Exact SQL joins",
+        "Approximate nearest-neighbor search over embeddings",
+        "Editing images",
+        "Sending email",
+      ],
+      answer: 1,
+    },
+    {
+      q: "Why not scan every vector for each query?",
+      options: [
+        "It’s O(n) and too slow at scale",
+        "It is illegal",
+        "Vectors cannot be compared",
+        "It needs a GPU",
+      ],
+      answer: 0,
+    },
+    {
+      q: "Which of these is a vector store?",
+      options: ["Chroma", "Excel", "Bash", "JPEG"],
+      answer: 0,
+    },
+  ],
+  rag: [
+    {
+      q: "RAG stands for…",
+      options: [
+        "Random Access Gradient",
+        "Retrieval-Augmented Generation",
+        "Recurrent Adaptive Gating",
+        "Rapid Array Grouping",
+      ],
+      answer: 1,
+    },
+    {
+      q: "The main problem RAG solves is…",
+      options: [
+        "Slow GPUs",
+        "LLMs hallucinating and being frozen in time",
+        "Large file uploads",
+        "Colour accuracy",
+      ],
+      answer: 1,
+    },
+    {
+      q: "What is the correct RAG order?",
+      options: [
+        "Generate → retrieve → index",
+        "Index → retrieve → augment → generate",
+        "Augment → index → answer",
+        "Retrieve → train → deploy",
+      ],
+      answer: 1,
+    },
+  ],
+  langchain: [
+    {
+      q: "LangChain is best described as…",
+      options: [
+        "A new large language model",
+        "Glue that composes prompts, models, retrievers, and tools",
+        "A vector database",
+        "A GPU driver",
+      ],
+      answer: 1,
+    },
+    {
+      q: "In LCEL, the | operator…",
+      options: [
+        "Divides two numbers",
+        "Pipes pieces (prompt | model | parser) together",
+        "Comments out code",
+        "Imports a module",
+      ],
+      answer: 1,
+    },
+    {
+      q: "An agent lets the model…",
+      options: [
+        "Render video",
+        "Call tools in a loop to take actions",
+        "Train itself",
+        "Compress data",
+      ],
+      answer: 1,
+    },
+  ],
 };
 
 /* ----------------------------------------------------------------------------
