@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { XLogo, LinkedinLogo, GithubLogo, DiscordLogo, ArrowRight } from "@phosphor-icons/react";
+import { XLogo, LinkedinLogo, GithubLogo, DiscordLogo } from "@phosphor-icons/react";
 import { Logo } from "@/components/ui/Logo";
 import { navLinks } from "@/lib/nav";
 import { staggerContainer, staggerItem } from "@/components/motion/Reveal";
