@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MagnifyingGlass, Check, Flask, Trophy } from "@phosphor-icons/react";
+import { MagnifyingGlass, Check, Flask, Trophy, Terminal } from "@phosphor-icons/react";
 import { curriculum, allTopics } from "@/lib/curriculum";
 import { useProgress } from "@/components/learn/progress";
 import { cn } from "@/lib/utils";
@@ -118,6 +118,31 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
         {!q ? (
           <div className="mt-4 border-t border-border-soft pt-3">
+            <Link
+              href="/learn/playground"
+              onClick={onNavigate}
+              className={cn(
+                "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
+                pathname === "/learn/playground"
+                  ? "bg-surface-2 text-text"
+                  : "text-muted hover:bg-surface-2/50 hover:text-text",
+              )}
+            >
+              <Terminal
+                size={16}
+                weight="fill"
+                className={cn(
+                  "shrink-0",
+                  pathname === "/learn/playground"
+                    ? "text-coral"
+                    : "text-faint group-hover:text-coral",
+                )}
+              />
+              <span className="flex-1 leading-tight font-medium">Playground</span>
+              <span className="font-mono text-[0.6rem] uppercase tracking-widest text-faint">
+                Labs
+              </span>
+            </Link>
             <Link
               href="/learn/final-exam"
               onClick={onNavigate}
