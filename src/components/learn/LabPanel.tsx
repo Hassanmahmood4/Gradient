@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChartLine, Code } from "@phosphor-icons/react";
 import { LabMount } from "@/components/learn/LabMount";
+import { CodeBlock } from "@/components/learn/CodeBlock";
 import type { LabCode, LabKey } from "@/lib/curriculum";
 import { cn } from "@/lib/utils";
 
@@ -48,12 +49,10 @@ export function LabPanel({ labKey, code }: { labKey: LabKey; code?: LabCode }) {
       </div>
 
       {tab === "code" ? (
-        <figure>
-          <pre className="overflow-x-auto rounded-xl border border-border-soft bg-bg/60 p-4 font-mono text-xs leading-relaxed text-text">
-            <code>{code.source}</code>
-          </pre>
+        <figure className="overflow-hidden rounded-xl border border-border-soft bg-bg/60">
+          <CodeBlock source={code.source} className="p-4" />
           {code.caption ? (
-            <figcaption className="mt-2 text-xs text-faint">
+            <figcaption className="border-t border-border-soft px-4 py-2.5 text-xs text-faint">
               {code.caption}
             </figcaption>
           ) : null}
