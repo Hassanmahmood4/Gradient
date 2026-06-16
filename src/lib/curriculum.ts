@@ -14,7 +14,16 @@ export type LabKey =
   | "random-forest"
   | "neural-net"
   | "bias-variance"
-  | "threshold";
+  | "threshold"
+  | "broadcasting"
+  | "dataframe"
+  | "autograd"
+  | "autograd-tf"
+  | "huggingface"
+  | "embeddings"
+  | "vector-search"
+  | "rag"
+  | "chain";
 
 export type Block =
   | { type: "p"; text: string }
@@ -1117,6 +1126,544 @@ f1 = 2 * precision * recall / (precision + recall)   # harmonic mean`,
               "AUC = 0.5 — no better than random guessing.",
               "Threshold-independent, so it’s great for comparing models.",
             ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "libraries",
+    title: "Libraries & Tools",
+    blurb: "The Python stack you’ll actually use.",
+    topics: [
+      {
+        slug: "numpy",
+        title: "NumPy",
+        summary: "Fast n-dimensional arrays — the foundation of the whole stack.",
+        lab: "broadcasting",
+        labCode: {
+          lang: "python",
+          caption: "Broadcasting stretches a size-1 dimension to match — exactly what the lab shows.",
+          source: `import numpy as np
+
+A = np.arange(3).reshape(3, 1)   # shape (3, 1)
+B = np.arange(4).reshape(1, 4)   # shape (1, 4)
+A + B                            # -> shape (3, 4), no loops`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "NumPy gives Python the ndarray: a contiguous, typed, n-dimensional array. Almost every other library — pandas, scikit-learn, PyTorch — is built on it or speaks its interface.",
+          },
+          { type: "h", text: "Shape, axis, dtype" },
+          {
+            type: "p",
+            text: "Every array has a shape (its dimensions) and a dtype (its element type). Reductions take an axis: axis=0 collapses rows to one value per column, axis=1 collapses columns to one per row. Getting the axis right is most of the battle.",
+          },
+          { type: "h", text: "Why it’s fast" },
+          {
+            type: "p",
+            text: "Operations are vectorised: a single optimised C loop runs over the whole array instead of a Python for-loop. That’s often 10–100× faster, and the code reads like the math.",
+          },
+          {
+            type: "code",
+            text: `import numpy as np
+
+X = np.array([[1, 2], [3, 4]])
+X.mean(axis=0)              # column means -> [2., 3.]
+X @ X.T                     # matrix multiply
+(X - X.mean()) / X.std()   # standardise, no loop`,
+          },
+          {
+            type: "list",
+            items: [
+              "Broadcasting — combine arrays of different shapes without copying.",
+              "dtype — every element shares one type (float64, int32, …).",
+              "Views vs copies — slicing returns a cheap view, not a new array.",
+            ],
+          },
+          {
+            type: "callout",
+            text: "If you’re writing a Python for-loop over an array, there’s almost always a vectorised one-liner that’s both shorter and faster.",
+          },
+        ],
+      },
+      {
+        slug: "pandas",
+        title: "Pandas",
+        summary: "Labeled tables for real-world, messy data.",
+        lab: "dataframe",
+        labCode: {
+          lang: "python",
+          caption: "Split-apply-combine — the grouping the lab animates.",
+          source: `import pandas as pd
+
+(df.groupby("city")["price"]
+   .mean()
+   .sort_values(ascending=False))`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "pandas adds the DataFrame: a 2-D table with labeled rows and columns, like a spreadsheet you can program. It’s where most ML projects begin — loading, cleaning, and exploring data.",
+          },
+          { type: "h", text: "Split — apply — combine" },
+          {
+            type: "p",
+            text: "That pattern is the heart of groupby: split rows into groups by a key, apply an aggregation to each group, then combine the results into a new table. It’s the workhorse of exploratory analysis.",
+          },
+          {
+            type: "code",
+            text: `import pandas as pd
+
+df = pd.read_csv("housing.csv")
+df.groupby("city")["price"].mean()
+df["price_per_m2"] = df["price"] / df["area"]
+df = df.dropna(subset=["price"])`,
+          },
+          { type: "h", text: "Core objects" },
+          {
+            type: "list",
+            items: [
+              "Series — one labeled column (a 1-D array with an index).",
+              "DataFrame — many aligned Series sharing one index.",
+              "Index — the row labels that keep everything aligned during joins and math.",
+            ],
+          },
+          {
+            type: "p",
+            text: "Most cleaning is a chain of select → filter → group → aggregate. Use .loc to select by label and .iloc to select by position.",
+          },
+          {
+            type: "callout",
+            text: "Call df.to_numpy() the moment you hand data to scikit-learn or a model — they want raw arrays, not labeled tables.",
+          },
+        ],
+      },
+      {
+        slug: "scikit-learn",
+        title: "scikit-learn",
+        summary: "Classical ML behind one consistent API.",
+        lab: "linear-regression",
+        labCode: {
+          lang: "python",
+          caption: "SGDRegressor.fit() runs gradient descent — the line the lab drags into place.",
+          source: `from sklearn.linear_model import SGDRegressor
+
+model = SGDRegressor(eta0=0.1, max_iter=1000)
+model.fit(X, y)        # gradient descent under the hood
+model.coef_, model.intercept_`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "scikit-learn implements the classical algorithms — regression, trees, SVMs, clustering — behind a single, predictable interface. Learn the pattern once and every model feels the same.",
+          },
+          { type: "h", text: "Transformers vs estimators" },
+          {
+            type: "p",
+            text: "Anything that learns and predicts is an estimator; anything that reshapes data (scalers, encoders, PCA) is a transformer with .fit and .transform. A Pipeline chains transformers into an estimator so the exact same steps run on train and test.",
+          },
+          { type: "h", text: "The estimator API" },
+          {
+            type: "code",
+            text: `from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2)
+model = RandomForestClassifier().fit(X_tr, y_tr)
+model.score(X_te, y_te)    # accuracy on held-out data`,
+          },
+          {
+            type: "list",
+            items: [
+              ".fit(X, y) — learn from data.",
+              ".predict(X) — make predictions.",
+              ".transform(X) — for preprocessing steps like scalers and encoders.",
+            ],
+          },
+          {
+            type: "p",
+            text: "A Pipeline chains preprocessing and a model into one object, so the exact same steps run on train and test — no data leakage.",
+          },
+          {
+            type: "callout",
+            text: "Reach for scikit-learn before deep learning: on tabular data a tuned gradient-boosted tree often beats a neural net.",
+          },
+        ],
+      },
+      {
+        slug: "pytorch",
+        title: "PyTorch",
+        summary: "Tensors and autograd for deep learning.",
+        lab: "autograd",
+        labCode: {
+          lang: "python",
+          caption: "Forward then backward — the computation graph the lab walks.",
+          source: `import torch
+
+x = torch.tensor(2.0)
+w = torch.tensor(1.5, requires_grad=True)
+loss = (x * w - 4) ** 2
+loss.backward()      # fills w.grad with dL/dw
+w.grad               # -> tensor(-2.0)`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "PyTorch is NumPy with two superpowers: arrays (tensors) that run on the GPU, and automatic differentiation. You write the forward pass; PyTorch works out the gradients.",
+          },
+          { type: "h", text: "The chain rule, automated" },
+          {
+            type: "p",
+            text: "Each operation knows its own local derivative. backward() multiplies them together from the loss back to every parameter — the chain rule, run for you. That’s all autograd really is.",
+          },
+          {
+            type: "code",
+            text: `import torch
+
+w = torch.zeros(1, requires_grad=True)
+for _ in range(100):
+    loss = ((X @ w - y) ** 2).mean()
+    loss.backward()            # autograd fills w.grad
+    with torch.no_grad():
+        w -= 0.1 * w.grad
+        w.grad.zero_()`,
+          },
+          { type: "h", text: "The building blocks" },
+          {
+            type: "list",
+            items: [
+              "Tensor — an n-D array with .to(\"cuda\") for GPU and requires_grad for tracking.",
+              "autograd — records operations into a graph, then backward() walks it.",
+              "nn.Module — bundles parameters and a forward() into a reusable layer or model.",
+            ],
+          },
+          {
+            type: "callout",
+            text: "torch.no_grad() turns off graph tracking — use it for the weight update and for inference to save memory.",
+          },
+        ],
+      },
+      {
+        slug: "tensorflow",
+        title: "TensorFlow",
+        summary: "Google’s deep-learning framework, Keras-first.",
+        lab: "autograd-tf",
+        labCode: {
+          lang: "python",
+          caption: "A small net learns the circle — the network the lab trains.",
+          source: `import tensorflow as tf
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(4, activation="tanh"),
+    tf.keras.layers.Dense(1, activation="sigmoid"),
+])
+model.compile(optimizer="sgd", loss="binary_crossentropy")
+model.fit(X, y, epochs=200)`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "TensorFlow is PyTorch’s main rival: tensors, autodiff, and GPU/TPU acceleration. Most people use it through Keras, its high-level model API.",
+          },
+          { type: "h", text: "Eager by default" },
+          {
+            type: "p",
+            text: "Modern TensorFlow runs eagerly — operations execute immediately, like normal Python — so debugging feels just like PyTorch. Wrap a function in tf.function to compile it into a fast graph once you need the speed.",
+          },
+          {
+            type: "code",
+            text: `import tensorflow as tf
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(32, activation="relu"),
+    tf.keras.layers.Dense(1),
+])
+model.compile(optimizer="adam", loss="mse")
+model.fit(X, y, epochs=10)`,
+          },
+          { type: "h", text: "Two levels" },
+          {
+            type: "list",
+            items: [
+              "Keras — define, compile, fit. The fast path for standard models.",
+              "tf.GradientTape — records the forward pass for custom training loops, like PyTorch’s autograd.",
+              "SavedModel — exports a trained graph to run on servers, browsers (TF.js), or phones (TF Lite).",
+            ],
+          },
+          {
+            type: "callout",
+            text: "For everyday work PyTorch and TensorFlow now look almost identical — pick the one your team or tutorials use.",
+          },
+        ],
+      },
+      {
+        slug: "hugging-face",
+        title: "Hugging Face",
+        summary: "Pretrained models and datasets, one import away.",
+        lab: "huggingface",
+        labCode: {
+          lang: "python",
+          caption: "One pipeline() call per task — the tasks the lab switches between.",
+          source: `from transformers import pipeline
+
+pipeline("sentiment-analysis")("This is great!")
+pipeline("ner")("Hugging Face is in New York.")
+pipeline("summarization")(long_text)`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "Hugging Face is the hub for pretrained models. Instead of training from scratch, you download a model someone else spent thousands of GPU-hours on and use or fine-tune it.",
+          },
+          { type: "h", text: "Use, then fine-tune" },
+          {
+            type: "p",
+            text: "Start with a pretrained model as-is. When your domain differs, fine-tune: continue training on a small labelled set of your own so the model adapts without relearning language from scratch.",
+          },
+          {
+            type: "code",
+            text: `from transformers import pipeline
+
+clf = pipeline("sentiment-analysis")
+clf("I love how visual this course is!")
+# [{'label': 'POSITIVE', 'score': 0.999}]`,
+          },
+          { type: "h", text: "The ecosystem" },
+          {
+            type: "list",
+            items: [
+              "transformers — load and run thousands of models with one API.",
+              "datasets — stream large datasets without filling your disk.",
+              "The Hub — share and discover models, datasets, and demos (Spaces).",
+            ],
+          },
+          {
+            type: "p",
+            text: "pipeline() is the quickest start; for full control, load the AutoTokenizer and AutoModel directly and write the loop yourself.",
+          },
+          {
+            type: "callout",
+            text: "Always check a model’s licence and intended use on its Hub card before you ship it.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "llm-retrieval",
+    title: "LLMs & Retrieval",
+    blurb: "Building apps with embeddings and RAG.",
+    topics: [
+      {
+        slug: "embeddings",
+        title: "Embeddings",
+        summary: "Turning text and images into vectors of meaning.",
+        lab: "embeddings",
+        labCode: {
+          lang: "python",
+          caption: "Cosine similarity scores alignment — the bars in the lab.",
+          source: `import numpy as np
+
+def cosine(a, b):
+    return a @ b / (np.linalg.norm(a) * np.linalg.norm(b))
+
+cosine(vecs["puppy"], vecs["dog"])   # ~0.9
+cosine(vecs["puppy"], vecs["tax"])   # ~0.0`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "An embedding maps a piece of data — a word, sentence, or image — to a list of numbers (a vector) so that similar things land near each other in space. Meaning becomes geometry.",
+          },
+          { type: "h", text: "Why a vector?" },
+          {
+            type: "p",
+            text: "Numbers let us measure closeness. Once meaning is a position, “similar” becomes “nearby”, and similarity is just an angle or distance you can compute — the basis of search, clustering, and RAG.",
+          },
+          { type: "math", text: "similarity(a, b) = (a · b) / (‖a‖ ‖b‖)" },
+          {
+            type: "p",
+            text: "That’s cosine similarity: the angle between two vectors. Close to 1 means “almost the same meaning”; near 0 means unrelated.",
+          },
+          {
+            type: "code",
+            text: `from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+vecs = model.encode(["a happy dog", "a joyful puppy", "tax law"])
+# vecs[0] and vecs[1] are close; vecs[2] is far away`,
+          },
+          {
+            type: "list",
+            items: [
+              "Dense vectors (often 384–1536 dims) capture semantics, not just keywords.",
+              "Directions carry meaning: “king − man + woman ≈ queen”.",
+              "The same idea powers search, clustering, recommendations, and RAG.",
+            ],
+          },
+          {
+            type: "callout",
+            text: "Embeddings are the bridge between messy human data and the math every model needs.",
+          },
+        ],
+      },
+      {
+        slug: "vector-databases",
+        title: "Vector Databases",
+        summary: "Storing and searching millions of embeddings fast.",
+        lab: "vector-search",
+        labCode: {
+          lang: "python",
+          caption: "Query → top-k nearest vectors, the search the lab runs.",
+          source: `import chromadb
+
+col = chromadb.Client().create_collection("docs")
+col.add(documents=texts, embeddings=vecs, ids=ids)
+col.query(query_embeddings=[q_vec], n_results=5)`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "Once your data is embedded, you need to find the nearest vectors to a query — fast, across millions of items. A vector database is built for exactly this: approximate nearest-neighbor (ANN) search.",
+          },
+          { type: "h", text: "Recall vs latency" },
+          {
+            type: "p",
+            text: "“Approximate” is the whole trick: instead of checking every vector, an ANN index skips most of them. You trade a sliver of recall — occasionally missing the true nearest — for searches that stay fast as the index grows into the millions.",
+          },
+          { type: "h", text: "Why not a normal database?" },
+          {
+            type: "p",
+            text: "Comparing a query against every vector is O(n) and too slow at scale. Vector DBs use ANN indexes (HNSW, IVF) that trade a sliver of accuracy for enormous speed.",
+          },
+          {
+            type: "code",
+            text: `import chromadb
+
+db = chromadb.Client()
+col = db.create_collection("docs")
+col.add(documents=texts, embeddings=vecs, ids=ids)
+col.query(query_embeddings=[q_vec], n_results=3)`,
+          },
+          {
+            type: "list",
+            items: [
+              "Popular options: Chroma, Pinecone, Weaviate, FAISS, pgvector.",
+              "Store metadata beside vectors to filter by date, source, or user.",
+              "Tune the index for the recall-vs-latency trade-off you need.",
+            ],
+          },
+          {
+            type: "callout",
+            text: "A RAG system’s answer quality lives or dies here: good embeddings plus a well-tuned index.",
+          },
+        ],
+      },
+      {
+        slug: "rag",
+        title: "RAG",
+        summary: "Grounding an LLM in your own documents.",
+        lab: "rag",
+        labCode: {
+          lang: "python",
+          caption: "Retrieve, stuff into the prompt, generate — the three stages in the lab.",
+          source: `chunks = retriever.search(question, k=3)
+context = "\\n".join(chunks)
+prompt = f"Use this context:\\n{context}\\n\\nQ: {question}"
+answer = llm(prompt)`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "Large language models are frozen at training time and will confidently make things up. Retrieval-Augmented Generation (RAG) fixes both: fetch relevant text first, then ask the model to answer using it.",
+          },
+          { type: "h", text: "Chunking matters" },
+          {
+            type: "p",
+            text: "Documents are split into chunks before embedding. Too big and retrieval drags in irrelevant text; too small and it loses context. Sensible, overlapping chunks are the quiet difference between a RAG system that works and one that doesn’t.",
+          },
+          { type: "h", text: "The pipeline" },
+          {
+            type: "ol",
+            items: [
+              "Index — split documents into chunks, embed them, store in a vector DB.",
+              "Retrieve — embed the question, fetch the top-k nearest chunks.",
+              "Augment — paste those chunks into the prompt as context.",
+              "Generate — the LLM answers grounded in the retrieved text.",
+            ],
+          },
+          {
+            type: "code",
+            text: `chunks = retriever.search(question, k=4)
+context = "\\n\\n".join(chunks)
+prompt = f"Answer using only this context:\\n{context}\\n\\nQ: {question}"
+answer = llm(prompt)`,
+          },
+          {
+            type: "list",
+            items: [
+              "Cuts hallucination — answers come from real, retrievable text.",
+              "Updates instantly — change the documents, not the model.",
+              "Cheaper than fine-tuning for fast-changing knowledge.",
+            ],
+          },
+          {
+            type: "callout",
+            text: "Most “chat with your PDF / docs” products are RAG under the hood.",
+          },
+        ],
+      },
+      {
+        slug: "langchain",
+        title: "LangChain",
+        summary: "Wiring LLMs, tools, and data into applications.",
+        lab: "chain",
+        labCode: {
+          lang: "python",
+          caption: "Pipe pieces with | — the chain you build in the lab.",
+          source: `from langchain_core.output_parsers import StrOutputParser
+
+chain = prompt | model | StrOutputParser()
+chain.invoke({"topic": "embeddings"})`,
+        },
+        content: [
+          {
+            type: "p",
+            text: "LangChain is a framework for building LLM applications. It standardises the pieces — prompts, models, retrievers, memory, tools — and lets you compose them into chains and agents.",
+          },
+          { type: "h", text: "Chains vs agents" },
+          {
+            type: "p",
+            text: "A chain runs a fixed sequence you define. An agent lets the model decide which tool to call next and loops until it’s done — more flexible, but harder to predict and debug. Reach for a chain first.",
+          },
+          {
+            type: "code",
+            text: `from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+prompt = ChatPromptTemplate.from_template("Explain {topic} simply.")
+chain = prompt | ChatOpenAI()        # LCEL: pipe the pieces together
+chain.invoke({"topic": "gradient descent"})`,
+          },
+          { type: "h", text: "What it gives you" },
+          {
+            type: "list",
+            items: [
+              "Chains — pipe prompt → model → parser with the | operator (LCEL).",
+              "Retrievers — drop-in RAG over your vector database.",
+              "Agents — let the model call tools (search, code, APIs) in a loop.",
+              "Memory — carry conversation state across turns.",
+            ],
+          },
+          {
+            type: "p",
+            text: "It’s glue: the value is fewer custom integrations, not new model capability.",
+          },
+          {
+            type: "callout",
+            text: "Start with a plain API call; reach for LangChain when you’re juggling retrieval, tools, and memory together.",
           },
         ],
       },
