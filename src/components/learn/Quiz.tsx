@@ -6,6 +6,7 @@ import { SignInButton } from "@clerk/nextjs";
 import type { ClientQuestion, GradeResult } from "@/lib/quiz-types";
 import { gradeQuiz } from "@/app/learn/actions";
 import { useProgress } from "@/components/learn/progress";
+import { Spinner } from "@/components/ui/Spinner";
 import { cn } from "@/lib/utils";
 
 export function Quiz({
@@ -178,7 +179,13 @@ export function Quiz({
             disabled={!allAnswered || pending}
             className="inline-flex items-center gap-2 rounded-full bg-coral px-5 py-2.5 text-sm font-semibold text-bg transition-colors hover:bg-coral-strong disabled:opacity-40"
           >
-            {pending ? "Checking…" : "Check answers"}
+            {pending ? (
+              <>
+                <Spinner size={15} /> Checking…
+              </>
+            ) : (
+              "Check answers"
+            )}
           </button>
         ) : (
           <button

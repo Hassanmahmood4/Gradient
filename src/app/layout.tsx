@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { SplashScreen } from "@/components/ui/SplashScreen";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -38,7 +39,10 @@ export default function RootLayout({
         lang="en"
         className={`${display.variable} ${sans.variable} ${mono.variable} antialiased`}
       >
-        <body>{children}</body>
+        <body>
+          <SplashScreen />
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );
