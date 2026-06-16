@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { XLogo, LinkedinLogo, GithubLogo, DiscordLogo, ArrowRight } from "@phosphor-icons/react";
 import { Logo } from "@/components/ui/Logo";
+import { navLinks } from "@/lib/nav";
 import { staggerContainer, staggerItem } from "@/components/motion/Reveal";
 
 const socials = [
@@ -11,8 +12,6 @@ const socials = [
   { icon: GithubLogo, label: "GitHub", href: "#" },
   { icon: DiscordLogo, label: "Discord", href: "#" },
 ];
-
-const nav = ["Curriculum", "Playgrounds", "Tools", "Pricing", "About"];
 
 export function Footer() {
   return (
@@ -84,13 +83,13 @@ export function Footer() {
 
         {/* right: nav links */}
         <motion.nav variants={staggerItem} className="flex flex-col gap-3 md:items-end md:text-right">
-          {nav.map((item) => (
+          {navLinks.map((item) => (
             <a
-              key={item}
-              href="#"
+              key={item.href}
+              href={item.href}
               className="font-display text-2xl font-semibold text-muted transition-colors hover:text-text"
             >
-              {item}
+              {item.label}
             </a>
           ))}
         </motion.nav>
